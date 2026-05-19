@@ -34,10 +34,12 @@ Stačí, aby měl článek originální TTS tlačítko Seznamu (`[data-dot="atm-
 | Microsoft Edge    | ✅ ověřeno     | Hlavní vývojový prohlížeč (Chromium-based).     |
 | Google Chrome     | ✅ ověřeno     | MV3 manifest, stejné API.                        |
 | Brave / Vivaldi / Opera | ✅ očekáváno | Chromium derivace, MV3 + `world: "MAIN"` musí být podporováno. |
-| Firefox           | ❌ nepodporováno | Manifest V3 v Firefoxu zatím neumí content scripty s `"world": "MAIN"`. |
+| Firefox (desktop) | ✅ přes userscript | MV3 v Firefoxu neumí `world: "MAIN"`, ale userscript distribuce přes Tampermonkey funguje. |
 | Safari            | ❌ nepodporováno | Web Extensions API se v `"world"` chová jinak. |
+| Mobil (Android)   | ✅ přes userscript | Chrome na Androidu rozšíření nemá; userscript funguje v **Edge for Android**, **Firefox for Android** nebo **Kiwi Browseru** s Tampermonkey. |
+| Mobil (iOS)       | ❌ nepodporováno | Všechny iOS prohlížeče běží na WebKitu a userscript managery jsou tam výrazně omezené. |
 
-**Minimální verze:** Chrome / Edge 111+ (kvůli `content_scripts[].world: "MAIN"`).
+**Minimální verze:** Chrome / Edge 111+ (kvůli `content_scripts[].world: "MAIN"`). Userscript distribuce minimum nemá — funguje všude, kde běží Tampermonkey/Violentmonkey s `@grant none`.
 
 ## Jak to funguje (technicky)
 
@@ -64,7 +66,18 @@ Stačí, aby měl článek originální TTS tlačítko Seznamu (`[data-dot="atm-
 | MP3 buckety              | `high_mp3 / medium_mp3 / low_mp3`    | `mp3_192k / mp3_128k / mp3_64k`        |
 | `duration`               | 15 – 30 s                            | typicky 60 – 300 s                     |
 
-## Instalace (Load unpacked)
+## Distribuce
+
+Rozšíření existuje ve dvou podobách — funkčně identických, lišících se jen způsobem instalace a tím, kde fungují:
+
+| Distribuce | Kde | Adresář |
+| ---------- | --- | ------- |
+| MV3 rozšíření | Desktop Chrome / Edge / Brave / Vivaldi / Opera | [`extension/`](extension/) |
+| Userscript    | Cokoli s Tampermonkey/Violentmonkey — vč. mobilu | [`userscript/article-audio-skipper.user.js`](userscript/article-audio-skipper.user.js) |
+
+Stačí jedna z nich; instalovat obě najednou nemá smysl (oba hooky by se prováděly dvakrát).
+
+## Instalace — MV3 rozšíření (Load unpacked)
 
 1. Naklonujte si repo:
    ```bash
@@ -82,6 +95,21 @@ Stačí, aby měl článek originální TTS tlačítko Seznamu (`[data-dot="atm-
 6. Přihlaste se na [novinky.cz](https://www.novinky.cz) (vpravo nahoře, Seznam účet).
 7. Otevřete libovolný článek s ikonou „přečíst nahlas" a klikněte na ni — reklamy se přeskočí
    během ~1 s a začne hrát článek.
+
+## Instalace — userscript (Tampermonkey / Violentmonkey)
+
+Pro mobil nebo Firefox; funguje i na desktopu, pokud nechcete instalovat rozšíření.
+
+1. Nainstalujte si do prohlížeče **Tampermonkey** nebo **Violentmonkey**.
+   - Android: nejjednodušší cesta je **Microsoft Edge for Android** s povolenými rozšířeními a Tampermonkey z addons.mozilla.org / Edge Add-ons, nebo **Firefox for Android** s Tampermonkey.
+2. Otevřete přímý odkaz na userscript:
+   - <https://raw.githubusercontent.com/Olbrasoft/article-audio-skipper/main/userscript/article-audio-skipper.user.js>
+3. Tampermonkey nabídne instalaci — potvrďte.
+4. Přihlaste se na [novinky.cz](https://www.novinky.cz) (Seznam účet) a otevřete článek s ikonou „přečíst nahlas".
+
+Userscript nemá Options stránku. Pokud chcete změnit preferovanou kvalitu MP3 pro diagnostický log,
+upravte konstantu `PREFERRED_QUALITY` nahoře v `article-audio-skipper.user.js` přímo v Tampermonkey
+editoru. Aktualizace skriptu si Tampermonkey tahá sám z `@updateURL`.
 
 ## Ověření, že funguje
 
@@ -104,16 +132,19 @@ Když uvidíte řádek `article reached … — unmuting`, je to úspěch.
 ```
 article-audio-skipper/
 ├── README.md
-└── extension/
-    ├── manifest.json              # MV3 manifest
-    ├── content/
-    │   ├── intercept.js           # MAIN-world: HTMLMediaElement.play hook + VMD logger
-    │   ├── player.js              # isolated-world: detekce kliknutí na TTS tlačítko
-    │   └── player.css             # CSS pro případný vlastní UI (aktuálně nepoužitý)
-    ├── options/
-    │   ├── options.html           # volba kvality MP3 (zatím jen pro diagnostiku)
-    │   └── options.js
-    └── icons/                     # placeholder PNG ikony 16/48/128
+├── LICENSE
+├── extension/                            # MV3 rozšíření (desktop Chromium)
+│   ├── manifest.json                     # MV3 manifest
+│   ├── content/
+│   │   ├── intercept.js                  # MAIN-world: HTMLMediaElement.play hook + VMD logger
+│   │   ├── player.js                     # isolated-world: detekce kliknutí na TTS tlačítko
+│   │   └── player.css                    # CSS pro případný vlastní UI (aktuálně nepoužitý)
+│   ├── options/
+│   │   ├── options.html                  # volba kvality MP3 (zatím jen pro diagnostiku)
+│   │   └── options.js
+│   └── icons/                            # placeholder PNG ikony 16/48/128
+└── userscript/
+    └── article-audio-skipper.user.js     # sloučená MAIN+isolated logika v jednom souboru
 ```
 
 ## Známé limity

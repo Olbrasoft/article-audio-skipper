@@ -4,7 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Chromium / Edge MV3 extension that silently fast-forwards preroll ads in front of Seznam-family TTS articles (novinky.cz, seznamzpravy.cz, sport.cz, super.cz, prozeny.cz). No own UI — it piggybacks on the original Seznam player. Proof-of-concept, plain JS / HTML / CSS, no build step, no tests.
+Silently fast-forwards preroll ads in front of Seznam-family TTS articles (novinky.cz, seznamzpravy.cz, sport.cz, super.cz, prozeny.cz). No own UI — it piggybacks on the original Seznam player. Proof-of-concept, plain JS / HTML / CSS, no build step, no tests.
+
+Two distributions, behaviorally identical, shipped from the same repo:
+
+- **`extension/`** — Chromium / Edge MV3 extension (desktop only). Two files split across two JS execution worlds; this is the primary distribution.
+- **`userscript/article-audio-skipper.user.js`** — single self-contained Tampermonkey/Violentmonkey userscript. Targets Firefox and mobile Chromium browsers (Edge / Kiwi / Firefox for Android) where MV3 with `world: "MAIN"` doesn't work. Uses `@grant none` to run in the page's JS context (the userscript-manager equivalent of MAIN world), which is the one thing that makes the `HTMLMediaElement.prototype.play` hook possible.
+
+The userscript is a hand-merged copy of `extension/content/intercept.js` + `extension/content/player.js`. There is no build step that generates one from the other — **if you change skip logic, the VMD URL regex, the TTS button selector, or the `AD_DURATION_MAX` threshold in the extension, update the userscript in the same commit** (and vice versa). The userscript drops the CustomEvent bridge between the two original files (both halves now live in the same world) and replaces `chrome.storage.sync` with a hardcoded `PREFERRED_QUALITY` constant, since `@grant none` precludes any `GM_*` API and that setting only affects the diagnostic VMD log anyway.
 
 ## Dev loop
 

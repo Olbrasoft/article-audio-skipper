@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Article Audio Skipper
 // @namespace    https://github.com/Olbrasoft/article-audio-skipper
-// @version      0.1.0
+// @version      0.2.0
 // @description  Přeskočí prerollové reklamy u TTS článků na webech Seznam rodiny (Novinky, Seznam Zprávy, Sport.cz, Super.cz, Prozeny.cz) a pustí rovnou namluvený článek.
 // @author       Olbrasoft
 // @homepageURL  https://github.com/Olbrasoft/article-audio-skipper
@@ -42,12 +42,27 @@
   const TTS_BTN_SELECTOR = '[data-dot="atm-tts-play-btn"]';
   const VMD_URL_RE = /sdn\.cz\/.*\/vmd[\/_].*spl2/;
   const AD_DURATION_MAX = 60; // seconds
+  const POST_ARTICLE_WINDOW_MS = 30000;
 
   console.info(TAG_INTERCEPT, 'installed at', location.href);
 
   // --- Fast-forward window state -------------------------------------------
+  //
+  // The window is opened by the TTS button click (60s) and re-opened by
+  // pause/ended on the article element (POST_ARTICLE_WINDOW_MS). The second
+  // mechanism is what catches mid-roll and post-roll ads: any genuine ad
+  // break must first pause or end the article element, which lets us re-open
+  // the window before the ad's .play() fires. Bounded length means an
+  // article-body <video> played by the user much later still works normally.
   let fastForwardUntil = 0;
   let articleStarted = false;
+  let articleEl = null;
+
+  function reopenForAdBreak(reason) {
+    articleStarted = false;
+    fastForwardUntil = Math.max(fastForwardUntil, Date.now() + POST_ARTICLE_WINDOW_MS);
+    console.info(TAG_INTERCEPT, `article ${reason} — fast-forward window reopened until`, new Date(fastForwardUntil).toISOString());
+  }
 
   // --- TTS button click detector (was player.js) ---------------------------
   // Document may not exist yet at document-start — defer click listener
@@ -93,10 +108,16 @@
         el.muted = false;
         articleStarted = true;
         fastForwardUntil = 0;
+        if (articleEl !== el) {
+          articleEl = el;
+          el.addEventListener('pause', () => reopenForAdBreak('paused'));
+          el.addEventListener('ended', () => reopenForAdBreak('ended'));
+        }
         el.removeEventListener('loadedmetadata', decide);
         el.removeEventListener('durationchange', decide);
       } else if (el.currentTime < d - 0.3) {
-        console.info(TAG_INTERCEPT, `fast-forwarding ad (${d.toFixed(1)}s)`);
+        const phase = !articleEl ? 'preroll' : articleEl.ended ? 'post-roll' : 'mid-roll';
+        console.info(TAG_INTERCEPT, `fast-forwarding ${phase} ad (${d.toFixed(1)}s)`);
         try { el.currentTime = d - 0.05; } catch {}
       }
     };

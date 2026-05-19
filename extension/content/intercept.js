@@ -1,14 +1,16 @@
 // Runs in MAIN world at document_start.
 //
 // Strategy: keep the original Seznam TTS player as the only visible UI. When the
-// user clicks the original play button, silently fast-forward any preroll ads so
-// Seznam's player advances to the article almost instantly, then unmute when the
-// article-length stream begins.
+// user clicks the original play button, silently fast-forward every ad in the
+// playlist — preroll, mid-roll, and post-roll — so Seznam's player advances
+// through the ads almost instantly and unmutes only on article-length streams.
 //
 // Heuristic for "is this an ad?": ad <video> elements have duration < 60s
 // (typical preroll = 15-30s); the article TTS is always > 60s. We additionally
-// scope this behavior to a time window opened by the TTS button click so we
-// never affect article-embedded videos on the same page.
+// scope this behavior to a time window opened by the TTS button click and
+// re-opened when the article element pauses or ends, which is how mid-roll
+// and post-roll ads are caught without false-positiving article-body videos
+// played long after listening (issue #1).
 //
 // VMD response interception is kept for diagnostics — it logs the article MP3
 // URL so it can be retrieved from the console / future "download MP3" feature.
@@ -17,18 +19,33 @@
   const TAG = '[AAS intercept]';
   const VMD_URL_RE = /sdn\.cz\/.*\/vmd[\/_].*spl2/;
   const AD_DURATION_MAX = 60; // seconds
+  const POST_ARTICLE_WINDOW_MS = 30000;
 
   console.info(TAG, 'installed at', location.href);
 
   // --- Fast-forward window state -------------------------------------------
+  //
+  // The window is opened by the TTS button click (60s) and re-opened by
+  // pause/ended on the article element (POST_ARTICLE_WINDOW_MS). The second
+  // mechanism is what catches mid-roll and post-roll ads: any genuine ad
+  // break must first pause or end the article element, which lets us re-open
+  // the window before the ad's .play() fires. Bounded length means an
+  // article-body <video> played by the user much later still works normally.
   let fastForwardUntil = 0;
   let articleStarted = false;
+  let articleEl = null;
 
   document.addEventListener('aas:tts-clicked', (e) => {
     fastForwardUntil = Math.max(fastForwardUntil, Number(e.detail?.until) || (Date.now() + 60000));
     articleStarted = false;
     console.info(TAG, 'fast-forward window opened until', new Date(fastForwardUntil).toISOString());
   });
+
+  function reopenForAdBreak(reason) {
+    articleStarted = false;
+    fastForwardUntil = Math.max(fastForwardUntil, Date.now() + POST_ARTICLE_WINDOW_MS);
+    console.info(TAG, `article ${reason} — fast-forward window reopened until`, new Date(fastForwardUntil).toISOString());
+  }
 
   // --- HTMLMediaElement.play() hook ---------------------------------------
   const origPlay = HTMLMediaElement.prototype.play;
@@ -54,11 +71,17 @@
         el.muted = false;
         articleStarted = true;
         fastForwardUntil = 0;
+        if (articleEl !== el) {
+          articleEl = el;
+          el.addEventListener('pause', () => reopenForAdBreak('paused'));
+          el.addEventListener('ended', () => reopenForAdBreak('ended'));
+        }
         el.removeEventListener('loadedmetadata', decide);
         el.removeEventListener('durationchange', decide);
       } else if (el.currentTime < d - 0.3) {
         // Ad — jump near the end so 'ended' fires and Seznam advances playlist
-        console.info(TAG, `fast-forwarding ad (${d.toFixed(1)}s)`);
+        const phase = !articleEl ? 'preroll' : articleEl.ended ? 'post-roll' : 'mid-roll';
+        console.info(TAG, `fast-forwarding ${phase} ad (${d.toFixed(1)}s)`);
         try { el.currentTime = d - 0.05; } catch {}
       }
     };

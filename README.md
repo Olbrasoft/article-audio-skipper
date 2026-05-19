@@ -148,7 +148,7 @@ Pro debugging:
 
 ## Licence
 
-MIT — viz `LICENSE` (zatím TODO).
+MIT — viz [`LICENSE`](LICENSE).
 
 ## Status
 

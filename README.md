@@ -36,7 +36,8 @@ Stačí, aby měl článek originální TTS tlačítko Seznamu (`[data-dot="atm-
 | Brave / Vivaldi / Opera | ✅ očekáváno | Chromium derivace, MV3 + `world: "MAIN"` musí být podporováno. |
 | Firefox (desktop) | ✅ přes userscript | MV3 v Firefoxu neumí `world: "MAIN"`, ale userscript distribuce přes Tampermonkey funguje. |
 | Safari            | ❌ nepodporováno | Web Extensions API se v `"world"` chová jinak. |
-| Mobil (Android)   | ✅ přes userscript | Chrome na Androidu rozšíření nemá; userscript funguje v **Edge for Android**, **Firefox for Android** nebo **Kiwi Browseru** s Tampermonkey. |
+| Mobil (Android, Edge/Firefox/Kiwi) | ✅ přes userscript | Tampermonkey + raw `.user.js` URL — plně automatické po nainstalování. |
+| Mobil (Android, Google Chrome) | ⚠️ jen přes bookmarklet | Chrome stable na Androidu neumí extensions ani userscript managery — bookmarklet z `bookmarklet/` je jediná cesta, vyžaduje ručně tuknout záložku na každém článku. |
 | Mobil (iOS)       | ❌ nepodporováno | Všechny iOS prohlížeče běží na WebKitu a userscript managery jsou tam výrazně omezené. |
 
 **Minimální verze:** Chrome / Edge 111+ (kvůli `content_scripts[].world: "MAIN"`). Userscript distribuce minimum nemá — funguje všude, kde běží Tampermonkey/Violentmonkey s `@grant none`.
@@ -73,9 +74,10 @@ Rozšíření existuje ve dvou podobách — funkčně identických, lišících
 | Distribuce | Kde | Adresář |
 | ---------- | --- | ------- |
 | MV3 rozšíření | Desktop Chrome / Edge / Brave / Vivaldi / Opera | [`extension/`](extension/) |
-| Userscript    | Cokoli s Tampermonkey/Violentmonkey — vč. mobilu | [`userscript/article-audio-skipper.user.js`](userscript/article-audio-skipper.user.js) |
+| Userscript    | Cokoli s Tampermonkey/Violentmonkey — vč. mobilního Edge / Firefox / Kiwi | [`userscript/article-audio-skipper.user.js`](userscript/article-audio-skipper.user.js) |
+| Bookmarklet   | Google Chrome na Androidu / iOS Safari / kdekoli, kde nejde nic jiného | [`bookmarklet/`](bookmarklet/) |
 
-Stačí jedna z nich; instalovat obě najednou nemá smysl (oba hooky by se prováděly dvakrát).
+Stačí jedna z nich; instalovat dvě najednou nemá smysl (oba hooky by se prováděly dvakrát).
 
 ## Instalace — MV3 rozšíření (Load unpacked)
 
@@ -111,6 +113,34 @@ Userscript nemá Options stránku. Pokud chcete změnit preferovanou kvalitu MP3
 upravte konstantu `PREFERRED_QUALITY` nahoře v `article-audio-skipper.user.js` přímo v Tampermonkey
 editoru. Aktualizace skriptu si Tampermonkey tahá sám z `@updateURL`.
 
+## Instalace — bookmarklet (Google Chrome na Androidu)
+
+Pro mobilní Chrome a kdekoli jinde, kde nejde extension ani userscript. Vyžaduje manuálně tuknout záložku **na každém článku** předtím, než tuknete play.
+
+**Jednou (nastavení záložky):**
+
+1. Otevřete v Chromu libovolnou stránku a tukněte ikonu hvězdičky → **Upravit záložku**.
+2. **Název:** `AAS` (libovolný, ale krátký se hodí pro autocomplete).
+3. **URL:** zkopírujte celý obsah souboru
+   [`bookmarklet/article-audio-skipper.bookmarklet.min.txt`](bookmarklet/article-audio-skipper.bookmarklet.min.txt)
+   (jeden řádek začínající `javascript:…`) a vložte jako URL záložky. Chrome blokuje psaní `javascript:` přímo do adresního řádku, ale **přes editaci záložky to projde**.
+4. Uložte.
+
+**Na každém článku:**
+
+1. Otevřete článek (novinky.cz, seznamzpravy.cz, …) a počkejte, až se načte.
+2. Tukněte do adresního řádku, napište `aas` — Chrome nabídne uloženou záložku.
+3. Tukněte na nabídku. Vyskočí alert *„Article Audio Skipper armed"* → OK.
+4. Tukněte na originální Seznam play tlačítko. Preroll, mid-roll i post-roll reklamy se přeskočí.
+
+**Známá omezení bookmarkletu:**
+
+- **Musíte tuknout na každém článku.** Bookmarklet se nespouští automaticky.
+- Pokud má Seznam na nějaké podstránce přísné CSP (`script-src` bez `unsafe-eval`), může Chrome bookmarklet zablokovat. V testech to nebyl problém, ale pokud nic nefunguje a v konzoli vidíte CSP chybu, nainstalujte si raději Edge / Firefox a použijte userscript.
+- Pro úplnou jistotu si zdrojový kód můžete přečíst v
+  [`bookmarklet/article-audio-skipper.bookmarklet.js`](bookmarklet/article-audio-skipper.bookmarklet.js)
+  (komentovaná, rozbalená verze).
+
 ## Ověření, že funguje
 
 V DevTools konzoli (F12) byste měli při kliknutí na play vidět:
@@ -143,8 +173,11 @@ article-audio-skipper/
 │   │   ├── options.html                  # volba kvality MP3 (zatím jen pro diagnostiku)
 │   │   └── options.js
 │   └── icons/                            # placeholder PNG ikony 16/48/128
-└── userscript/
-    └── article-audio-skipper.user.js     # sloučená MAIN+isolated logika v jednom souboru
+├── userscript/
+│   └── article-audio-skipper.user.js     # sloučená MAIN+isolated logika v jednom souboru
+└── bookmarklet/
+    ├── article-audio-skipper.bookmarklet.js       # zdroj (komentovaný, rozbalený)
+    └── article-audio-skipper.bookmarklet.min.txt  # jeden řádek javascript:… URL k vložení do záložky
 ```
 
 ## Známé limity

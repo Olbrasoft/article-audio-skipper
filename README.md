@@ -117,23 +117,24 @@ editoru. Aktualizace skriptu si Tampermonkey tahá sám z `@updateURL`.
 
 Pro mobilní Chrome a kdekoli jinde, kde nejde extension ani userscript. Vyžaduje manuálně tuknout záložku **na každém článku** předtím, než tuknete play.
 
-**Jednou (nastavení záložky):**
+> 📖 **Podrobný návod s obrázky a pitfally pro netechnické uživatele:**
+> [`docs/instalace-na-telefonu.md`](docs/instalace-na-telefonu.md)
 
-1. Otevřete v Chromu libovolnou stránku a tukněte ikonu hvězdičky → **Upravit záložku**.
-2. **Název:** `AAS` (libovolný, ale krátký se hodí pro autocomplete).
-3. **URL:** zkopírujte celý obsah souboru
-   [`bookmarklet/article-audio-skipper.bookmarklet.min.txt`](bookmarklet/article-audio-skipper.bookmarklet.min.txt)
-   (jeden řádek začínající `javascript:…`) a vložte jako URL záložky. Chrome blokuje psaní `javascript:` přímo do adresního řádku, ale **přes editaci záložky to projde**.
-4. Uložte.
+**Stručná verze (pokud si troufnete bez obrázků):**
 
-**Na každém článku:**
+1. Otevřete **samostatnou aplikaci Chrome** (ne vyskakovací prohlížeč z Google search widgetu).
+2. V Chromu otevřete [`bookmarklet/article-audio-skipper.bookmarklet.min.txt`](bookmarklet/article-audio-skipper.bookmarklet.min.txt), dlouze podržte prst **na textu v těle stránky** (ne na adrese!) → **Vybrat vše** → **Kopírovat**.
+3. Uložte libovolnou stránku jako záložku (hvězdička v menu). Hned tukněte **Upravit** v bublině „Záložka přidána".
+4. V editoru přejmenujte **Název** na `aas`. **Vymažte celý obsah pole „Adresa URL"** a vložte zkopírovaný text. Zkontrolujte, že URL začíná přesně `javascript:void(`. Uložte.
+5. Na článku napište `aas` do adresního řádku → tukněte návrh záložky → OK na popup *„armed"* → tukněte Seznam play.
 
-1. Otevřete článek (novinky.cz, seznamzpravy.cz, …) a počkejte, až se načte.
-2. Tukněte do adresního řádku, napište `aas` — Chrome nabídne uloženou záložku.
-3. Tukněte na nabídku. Vyskočí alert *„Article Audio Skipper armed"* → OK.
-4. Tukněte na originální Seznam play tlačítko. Preroll, mid-roll i post-roll reklamy se přeskočí.
+**Časté chyby (viz podrobný návod pro nápravu):**
 
-**Známá omezení bookmarkletu:**
+- Bookmarkujete URL místo *obsahu* stránky — záložka pak jen přesměrovává na github raw text místo aby spouštěla skript.
+- V editoru záložky **není** samostatné pole pro „JavaScript text" — `javascript:…` kód musí jít přímo do pole **„Adresa URL"** místo původní `https://…` adresy.
+- Použijete vyskakovací prohlížeč z Google search widgetu (Chrome Custom Tab) místo samostatné Chrome aplikace — Custom Tab nemá funkční záložky.
+
+**Známá omezení:**
 
 - **Musíte tuknout na každém článku.** Bookmarklet se nespouští automaticky.
 - Pokud má Seznam na nějaké podstránce přísné CSP (`script-src` bez `unsafe-eval`), může Chrome bookmarklet zablokovat. V testech to nebyl problém, ale pokud nic nefunguje a v konzoli vidíte CSP chybu, nainstalujte si raději Edge / Firefox a použijte userscript.
@@ -175,9 +176,12 @@ article-audio-skipper/
 │   └── icons/                            # placeholder PNG ikony 16/48/128
 ├── userscript/
 │   └── article-audio-skipper.user.js     # sloučená MAIN+isolated logika v jednom souboru
-└── bookmarklet/
-    ├── article-audio-skipper.bookmarklet.js       # zdroj (komentovaný, rozbalený)
-    └── article-audio-skipper.bookmarklet.min.txt  # jeden řádek javascript:… URL k vložení do záložky
+├── bookmarklet/
+│   ├── article-audio-skipper.bookmarklet.js       # zdroj (komentovaný, rozbalený)
+│   └── article-audio-skipper.bookmarklet.min.txt  # jeden řádek javascript:… URL k vložení do záložky
+└── docs/
+    ├── instalace-na-telefonu.md          # podrobný návod s obrázky pro Chrome Android
+    └── images/                           # screenshoty k mobilnímu návodu
 ```
 
 ## Známé limity

@@ -53,35 +53,56 @@ Jak Custom Tab poznáš:
 - Titulek stránky „Seznam – ..." s drobnou doménou `seznam.cz` pod ním.
 - Žádné ikony tabů ani plnohodnotné menu záložek.
 
-**Tohle musíš zavřít a otevřít samostatnou aplikaci Chrome:**
+### Nejrychlejší cesta ven: „Otevřít v prohlížeči Chrome"
+
+Custom Tab má v menu (3 tečky vpravo nahoře) tlačítko, které tu samou stránku
+**rovnou otevře v plné aplikaci Chrome** — to je nejjednodušší cesta, jak se z
+toho vyskakovacího prohlížeče dostat do skutečného Chromu, aniž bys hledal/a
+ikonu na ploše:
+
+1. V Custom Tab tukni **tři tečky vpravo nahoře**.
+2. V menu, které se otevře, najdi a tukni položku
+   **„Otevřít v prohlížeči Chrome"** (s ikonou šipky se čtverečkem
+   ↗ vpravo):
+
+   ![Menu Custom Tab s nabídkou Otevřít v prohlížeči Chrome](images/02b-open-in-chrome-from-custom-tab.png)
+
+3. Tatáž stránka se otevře v samostatné aplikaci Chrome (na obrazovce se
+   přepne nahoru lišta s adresním řádkem a ikona tabů — viz následující
+   obrázek).
+
+> **Když místo „Otevřít v prohlížeči Chrome" vidíš „Otevřít v prohlížeči
+> Samsung..." nebo jiný název**, znamená to, že máš nastavený jiný prohlížeč
+> než Chrome jako výchozí. Tato nabídka totiž otevře tvůj výchozí prohlížeč,
+> ne nutně Chrome. Příklad, jak to vypadá při Samsung Internet jako výchozím:
+>
+> ![Custom Tab s nabídkou Otevřít v prohlížeči Samsung](images/02-open-in-samsung-menu.png)
+>
+> Buď použij alternativní cestu níže (otevřít Chrome z ikony na ploše), nebo
+> si nastav Chrome jako výchozí: **Nastavení** telefonu → lupa → napiš
+> `výchozí` → **Výchozí aplikace** → **Aplikace prohlížeče** → vyber
+> **Chrome**. Pak tu samou nabídku v Custom Tab uvidíš jako „Otevřít v
+> prohlížeči Chrome" jako v prvním screenshotu výše.
+>
+> (V obou screenshotech si můžeš dole všimnout drobného nápisu **„Spuštěno
+> v aplikaci Chrome"** — to potvrzuje, že Custom Tab uvnitř používá Chrome
+> engine. **Bookmarklet ale v Custom Tab stejně nefunguje**, protože nemá
+> přístup do uložených záložek plné aplikace Chrome.)
+
+### Alternativa: otevřít Chrome ručně z plochy
+
+Pokud z nějakého důvodu nechceš nebo nemůžeš použít cestu „Otevřít v
+prohlížeči Chrome" (např. ji ti telefon vůbec nenabízí):
 
 1. Stiskni domovské tlačítko (kruh dole uprostřed).
 2. Najdi na ploše nebo v zásuvce aplikací **ikonu Chrome** (barevný kruh —
    červená/žlutá/zelená/modrá s bílým středem, pod ním nápis **Chrome**).
-3. Tukni na ni.
+3. Tukni na ni a zadej adresu článku ručně.
 
-Plný Chrome poznáš podle adresního řádku nahoře a ikony **tabů (čtvereček s
-číslem)** vpravo od adresy:
+Plný Chrome poznáš podle adresního řádku nahoře a ikony **tabů (čtvereček
+s číslem)** vpravo od adresy:
 
 ![Plný Chrome aplikace](images/03-chrome-opened.png)
-
-> **Tip:** Pokud chceš, aby ti Google search rovnou otevíral Chrome (a ne
-> Custom Tab), nastav Chrome jako výchozí prohlížeč: **Nastavení** telefonu →
-> lupa → napiš `výchozí` → **Výchozí aplikace** → **Aplikace prohlížeče** →
-> vyber **Chrome**. **Toto však není nutné** pro instalaci ani každodenní
-> používání bookmarkletu — stačí prostě otevírat Chrome rovnou.
-
-### Vedlejší pozorování: „Otevřít v prohlížeči Samsung"
-
-V Custom Tab menu (3 tečky) ti telefon nabídne **„Otevřít v prohlížeči
-Sams..."** — to znamená, že máš nastavený **Samsung Internet** jako výchozí
-prohlížeč. Tady to teď neřeš, na bookmarklet to nemá vliv:
-
-![Menu Custom Tab nabízí otevření v Samsung browseru](images/02-open-in-samsung-menu.png)
-
-(V menu uvidíš dole drobný text **„Spuštěno v aplikaci Chrome"** — to potvrzuje,
-že ten Custom Tab uvnitř používá Chrome engine, ale **bookmarky tam stejně
-nezprovozníš**.)
 
 ---
 

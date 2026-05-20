@@ -94,10 +94,23 @@ ikonu na ploše:
 Pokud z nějakého důvodu nechceš nebo nemůžeš použít cestu „Otevřít v
 prohlížeči Chrome" (např. ji ti telefon vůbec nenabízí):
 
-1. Stiskni domovské tlačítko (kruh dole uprostřed).
-2. Najdi na ploše nebo v zásuvce aplikací **ikonu Chrome** (barevný kruh —
-   červená/žlutá/zelená/modrá s bílým středem, pod ním nápis **Chrome**).
-3. Tukni na ni a zadej adresu článku ručně.
+1. Stiskni domovské tlačítko (kruh dole uprostřed). Vrátíš se na **plochu**.
+2. Najdi **ikonu aplikace Chrome**. Na novějších Samsung telefonech (a
+   některých dalších Androidech) Chrome **není přímo na ploše**, ale **uvnitř
+   složky „Google"** — vypadá jako čtvereček s drobnou 2×2 mřížkou barevných
+   ikonek a nápisem **Google** pod ní:
+
+   ![Plocha telefonu se složkou Google obsahující Chrome](images/03b-home-screen-google-folder.png)
+
+3. Tukni na složku **Google**. Otevře se okno se všemi Google aplikacemi —
+   Chrome je tam jako **„Chrome"** (modrá ikona kruhu s bílým středem):
+
+   ![Rozbalená složka Google se zvýrazněnou ikonou Chrome](images/03c-google-folder-with-chrome.png)
+
+4. Tukni **Chrome**. Pokud Chrome **ani ve složce Google nenajdeš**, je možné,
+   že ho nemáš nainstalovaný — otevři **Obchod Play**, vyhledej „Chrome" a
+   nainstaluj.
+5. V Chromu zadej adresu článku ručně (`novinky.cz`, `seznamzpravy.cz`, …).
 
 Plný Chrome poznáš podle adresního řádku nahoře a ikony **tabů (čtvereček
 s číslem)** vpravo od adresy:
